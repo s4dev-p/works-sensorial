@@ -1239,4 +1239,4 @@ function initializeParticleSystem() {
 window.initializeThemeToggle = initializeThemeToggle;
 window.initializeParticleSystem = initializeParticleSystem;
 
-console.log('🚀 Ambiente Sensorial - Sistema Ultra Moderno 2025 carregado com sucesso!');
+console.log('🚀 Ambiente Sensorial Inteligente 2025 - Sistema de Nova Geração Ativado! ✨');
