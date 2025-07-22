@@ -6,16 +6,8 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initializeApp() {
-    // Hide loading screen
-    setTimeout(() => {
-        const loadingScreen = document.getElementById('loading-screen');
-        if (loadingScreen) {
-            loadingScreen.style.opacity = '0';
-            setTimeout(() => {
-                loadingScreen.style.display = 'none';
-            }, 500);
-        }
-    }, 1500);
+    // Initialize loading screen with progress
+    initializeLoadingScreen();
 
     // Initialize all components
     initializeNavigation();
@@ -30,8 +22,48 @@ function initializeApp() {
     initializeBackToTop();
     initializeNewsletterForm();
     
-    // Show cookie banner after 2 seconds
-    setTimeout(showCookieBanner, 2000);
+    // Initialize Lucide icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+    
+    // Show cookie banner after 3 seconds
+    setTimeout(showCookieBanner, 3000);
+}
+
+function initializeLoadingScreen() {
+    const loadingScreen = document.getElementById('loading-screen');
+    const progressBar = document.getElementById('progress-bar');
+    
+    if (!loadingScreen || !progressBar) return;
+    
+    let progress = 0;
+    const duration = 2000; // 2 seconds
+    const steps = 60; // 60 FPS
+    const increment = 100 / steps;
+    const interval = duration / steps;
+    
+    const updateProgress = () => {
+        progress += increment;
+        progressBar.style.width = `${Math.min(progress, 100)}%`;
+        
+        if (progress < 100) {
+            setTimeout(updateProgress, interval);
+        } else {
+            // Hide loading screen after progress completes
+            setTimeout(() => {
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                    // Trigger entrance animations
+                    document.body.classList.add('loaded');
+                }, 500);
+            }, 300);
+        }
+    };
+    
+    // Start progress animation
+    setTimeout(updateProgress, 100);
 }
 
 // ==================== NAVIGATION ====================
@@ -861,11 +893,13 @@ function initializeBackToTop() {
     const backToTopBtn = document.getElementById('back-to-top');
     
     if (backToTopBtn) {
-        window.addEventListener('scroll', () => {
+        window.addEventListener('scroll', throttle(() => {
             if (window.scrollY > 300) {
+                backToTopBtn.classList.add('visible');
                 backToTopBtn.style.display = 'flex';
                 backToTopBtn.style.opacity = '1';
             } else {
+                backToTopBtn.classList.remove('visible');
                 backToTopBtn.style.opacity = '0';
                 setTimeout(() => {
                     if (window.scrollY <= 300) {
@@ -873,7 +907,7 @@ function initializeBackToTop() {
                     }
                 }, 300);
             }
-        });
+        }, 100));
     }
 }
 
