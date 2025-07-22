@@ -6,11 +6,9 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initializeApp() {
-    // Initialize loading screen with progress
-    initializeLoadingScreen();
-
     // Initialize all components
     initializeNavigation();
+    initializeThemeToggle();
     initializeAnimations();
     initializeCarousels();
     initializeCounters();
@@ -21,50 +19,21 @@ function initializeApp() {
     initializeCookieBanner();
     initializeBackToTop();
     initializeNewsletterForm();
+    initializeParticleSystem();
     
     // Initialize Lucide icons
     if (typeof lucide !== 'undefined') {
         lucide.createIcons();
     }
     
-    // Show cookie banner after 3 seconds
-    setTimeout(showCookieBanner, 3000);
+    // Trigger entrance animations immediately
+    document.body.classList.add('loaded');
+    
+    // Show cookie banner after 2 seconds
+    setTimeout(showCookieBanner, 2000);
 }
 
-function initializeLoadingScreen() {
-    const loadingScreen = document.getElementById('loading-screen');
-    const progressBar = document.getElementById('progress-bar');
-    
-    if (!loadingScreen || !progressBar) return;
-    
-    let progress = 0;
-    const duration = 2000; // 2 seconds
-    const steps = 60; // 60 FPS
-    const increment = 100 / steps;
-    const interval = duration / steps;
-    
-    const updateProgress = () => {
-        progress += increment;
-        progressBar.style.width = `${Math.min(progress, 100)}%`;
-        
-        if (progress < 100) {
-            setTimeout(updateProgress, interval);
-        } else {
-            // Hide loading screen after progress completes
-            setTimeout(() => {
-                loadingScreen.style.opacity = '0';
-                setTimeout(() => {
-                    loadingScreen.style.display = 'none';
-                    // Trigger entrance animations
-                    document.body.classList.add('loaded');
-                }, 500);
-            }, 300);
-        }
-    };
-    
-    // Start progress animation
-    setTimeout(updateProgress, 100);
-}
+
 
 // ==================== NAVIGATION ====================
 function initializeNavigation() {
@@ -1101,4 +1070,134 @@ window.declineCookies = declineCookies;
 window.scrollToTop = scrollToTop;
 window.scrollToDownloads = scrollToDownloads;
 
-console.log('🚀 Ambiente Sensorial - Sistema carregado com sucesso!');
+// ==================== THEME TOGGLE ====================
+function initializeThemeToggle() {
+    const themeToggle = document.getElementById('theme-toggle');
+    const body = document.body;
+    
+    // Check saved theme preference
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    body.setAttribute('data-theme', savedTheme);
+    updateThemeIcon(savedTheme);
+    
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+            
+            // Add transition effect
+            themeToggle.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                themeToggle.style.transform = 'scale(1)';
+            }, 150);
+        });
+    }
+}
+
+function updateThemeIcon(theme) {
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+        const moonIcon = themeToggle.querySelector('.fa-moon');
+        const sunIcon = themeToggle.querySelector('.fa-sun');
+        
+        if (theme === 'dark') {
+            moonIcon.style.opacity = '0.3';
+            sunIcon.style.opacity = '1';
+            themeToggle.querySelector('::before') && (themeToggle.style.setProperty('--toggle-position', '18px'));
+        } else {
+            moonIcon.style.opacity = '1';
+            sunIcon.style.opacity = '0.3';
+            themeToggle.querySelector('::before') && (themeToggle.style.setProperty('--toggle-position', '0px'));
+        }
+    }
+}
+
+// ==================== PARTICLE SYSTEM ====================
+function initializeParticleSystem() {
+    // Create canvas element dynamically
+    const particleCanvas = document.createElement('canvas');
+    particleCanvas.id = 'particle-canvas';
+    particleCanvas.style.position = 'fixed';
+    particleCanvas.style.top = '0';
+    particleCanvas.style.left = '0';
+    particleCanvas.style.width = '100%';
+    particleCanvas.style.height = '100%';
+    particleCanvas.style.zIndex = '-1';
+    particleCanvas.style.pointerEvents = 'none';
+    particleCanvas.style.opacity = '0.6';
+    
+    document.body.appendChild(particleCanvas);
+    
+    const ctx = particleCanvas.getContext('2d');
+    
+    // Resize canvas
+    function resizeCanvas() {
+        particleCanvas.width = window.innerWidth;
+        particleCanvas.height = window.innerHeight;
+    }
+    
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    
+    // Particle class
+    class Particle {
+        constructor() {
+            this.x = Math.random() * particleCanvas.width;
+            this.y = Math.random() * particleCanvas.height;
+            this.vx = (Math.random() - 0.5) * 0.3;
+            this.vy = (Math.random() - 0.5) * 0.3;
+            this.radius = Math.random() * 1.5 + 0.5;
+            this.opacity = Math.random() * 0.3 + 0.1;
+            this.hue = Math.random() * 60 + 220; // Blue to purple range
+        }
+        
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            
+            if (this.x < 0 || this.x > particleCanvas.width) this.vx *= -1;
+            if (this.y < 0 || this.y > particleCanvas.height) this.vy *= -1;
+            
+            // Fade effect
+            this.opacity += (Math.random() - 0.5) * 0.01;
+            this.opacity = Math.max(0.05, Math.min(0.4, this.opacity));
+        }
+        
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.fillStyle = `hsla(${this.hue}, 70%, 60%, ${this.opacity})`;
+            ctx.fill();
+        }
+    }
+    
+    // Create particles
+    const particles = [];
+    for (let i = 0; i < 40; i++) {
+        particles.push(new Particle());
+    }
+    
+    // Animation loop
+    function animate() {
+        ctx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+        
+        particles.forEach(particle => {
+            particle.update();
+            particle.draw();
+        });
+        
+        requestAnimationFrame(animate);
+    }
+    
+    animate();
+}
+
+// Expose new functions globally
+window.initializeThemeToggle = initializeThemeToggle;
+window.initializeParticleSystem = initializeParticleSystem;
+
+console.log('🚀 Ambiente Sensorial - Sistema Ultra Moderno 2025 carregado com sucesso!');

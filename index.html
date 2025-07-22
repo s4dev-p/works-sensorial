@@ -40,75 +40,119 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div id="loading-screen" class="loading-screen">
-        <div class="loading-content">
-            <div class="loading-icon">
-                <i class="fas fa-brain"></i>
-            </div>
-            <div class="loading-spinner">
-                <div class="spinner-ring"></div>
-                <div class="spinner-ring"></div>
-                <div class="spinner-ring"></div>
-            </div>
-            <h3 class="loading-title">Ambiente Sensorial</h3>
-            <p class="loading-text">Carregando experiência inovadora...</p>
-            <div class="loading-progress">
-                <div class="progress-bar" id="progress-bar"></div>
-            </div>
-        </div>
-    </div>
+
 
     <!-- Navigation -->
     <nav class="navbar" id="navbar">
+        <div class="nav-background"></div>
         <div class="nav-container">
             <div class="nav-logo">
-                <span class="logo-icon">
+                <div class="logo-icon">
                     <i class="fas fa-brain"></i>
-                </span>
-                Ambiente Sensorial
+                    <div class="logo-pulse"></div>
+                </div>
+                <div class="logo-text">
+                    <span class="logo-main">Ambiente Sensorial</span>
+                    <span class="logo-sub">Research 2024</span>
+                </div>
             </div>
             <div class="nav-menu" id="nav-menu">
-                <a href="#home" class="nav-link">Início</a>
-                <a href="#problema" class="nav-link">Problema</a>
-                <a href="#objetivos" class="nav-link">Objetivos</a>
-                <a href="#metodologia" class="nav-link">Metodologia</a>
-                <a href="#embasamento" class="nav-link">Teoria</a>
-                <a href="#resultados" class="nav-link">Resultados</a>
-                <a href="#prototipos" class="nav-link">Protótipos</a>
-                <a href="#conclusao" class="nav-link">Conclusão</a>
+                <div class="nav-indicator"></div>
+                <a href="#home" class="nav-link active" data-section="home">
+                    <span class="link-text">Início</span>
+                    <span class="link-icon"><i class="fas fa-home"></i></span>
+                </a>
+                <a href="#problema" class="nav-link" data-section="problema">
+                    <span class="link-text">Problema</span>
+                    <span class="link-icon"><i class="fas fa-exclamation-triangle"></i></span>
+                </a>
+                <a href="#objetivos" class="nav-link" data-section="objetivos">
+                    <span class="link-text">Objetivos</span>
+                    <span class="link-icon"><i class="fas fa-bullseye"></i></span>
+                </a>
+                <a href="#metodologia" class="nav-link" data-section="metodologia">
+                    <span class="link-text">Metodologia</span>
+                    <span class="link-icon"><i class="fas fa-cogs"></i></span>
+                </a>
+                <a href="#embasamento" class="nav-link" data-section="embasamento">
+                    <span class="link-text">Teoria</span>
+                    <span class="link-icon"><i class="fas fa-book"></i></span>
+                </a>
+                <a href="#resultados" class="nav-link" data-section="resultados">
+                    <span class="link-text">Resultados</span>
+                    <span class="link-icon"><i class="fas fa-chart-line"></i></span>
+                </a>
+                <a href="#prototipos" class="nav-link" data-section="prototipos">
+                    <span class="link-text">Protótipos</span>
+                    <span class="link-icon"><i class="fas fa-cube"></i></span>
+                </a>
+                <a href="#conclusao" class="nav-link" data-section="conclusao">
+                    <span class="link-text">Conclusão</span>
+                    <span class="link-icon"><i class="fas fa-flag-checkered"></i></span>
+                </a>
                 <div class="nav-social">
                     <a href="#" class="social-link" title="Compartilhar no Twitter">
                         <i class="fab fa-twitter"></i>
+                        <span class="social-tooltip">Twitter</span>
                     </a>
                     <a href="#" class="social-link" title="Compartilhar no LinkedIn">
                         <i class="fab fa-linkedin"></i>
+                        <span class="social-tooltip">LinkedIn</span>
                     </a>
                     <a href="#" class="social-link" title="Compartilhar no WhatsApp">
                         <i class="fab fa-whatsapp"></i>
+                        <span class="social-tooltip">WhatsApp</span>
                     </a>
                 </div>
             </div>
-            <div class="hamburger" id="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
+            <div class="nav-controls">
+                <button class="theme-toggle" id="theme-toggle" title="Alternar tema">
+                    <i class="fas fa-moon"></i>
+                    <i class="fas fa-sun"></i>
+                </button>
+                <div class="hamburger" id="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span class="hamburger-bg"></span>
+                </div>
             </div>
         </div>
     </nav>
 
+    <!-- Particle Background -->
+    <div id="particles-canvas"></div>
+    
     <!-- Hero Section -->
     <section id="home" class="hero">
+        <div class="hero-background">
+            <div class="floating-shapes">
+                <div class="shape shape-1"></div>
+                <div class="shape shape-2"></div>
+                <div class="shape shape-3"></div>
+                <div class="shape shape-4"></div>
+                <div class="shape shape-5"></div>
+            </div>
+        </div>
         <div class="hero-container">
             <div class="hero-content">
                 <div class="hero-badge">
+                    <span class="badge-glow"></span>
                     <span class="badge-icon">
                         <i class="fas fa-trophy"></i>
                     </span>
-                    Pesquisa Premiada 2024
+                    <span class="badge-text">Pesquisa Premiada 2024</span>
+                    <div class="badge-particles"></div>
                 </div>
-                <h1 class="hero-title">Ambiente Sensorial para Adaptação Escolar</h1>
-                <p class="hero-subtitle">Projeto de Pesquisa – <strong>Giovanna Romeu Souza</strong> (9º ano, E.M.E.F Padre João Schiavo)</p>
+                <h1 class="hero-title">
+                    <span class="title-line">Ambiente Sensorial</span>
+                    <span class="title-line">para Adaptação</span>
+                    <span class="title-line gradient-text">Escolar</span>
+                </h1>
+                <div class="hero-subtitle-container">
+                    <p class="hero-subtitle">Projeto de Pesquisa – <strong>Giovanna Romeu Souza</strong></p>
+                    <p class="hero-institution">(9º ano, E.M.E.F Padre João Schiavo)</p>
+                </div>
                 <p class="hero-description">Descubra como um <strong>ambiente sensorial inovador</strong> pode revolucionar a experiência educacional das crianças, transformando ansiedade em curiosidade e medo em descoberta.</p>
                 
                 <!-- Enhanced Hero Stats -->
