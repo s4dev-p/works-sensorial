@@ -1116,84 +1116,123 @@ function updateThemeIcon(theme) {
     }
 }
 
-// ==================== PARTICLE SYSTEM ====================
+// ==================== OPTIMIZED PARTICLE SYSTEM ====================
 function initializeParticleSystem() {
-    // Create canvas element dynamically
+    // Only initialize on desktop for performance
+    if (window.innerWidth < 768 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        return;
+    }
+    
     const particleCanvas = document.createElement('canvas');
     particleCanvas.id = 'particle-canvas';
-    particleCanvas.style.position = 'fixed';
-    particleCanvas.style.top = '0';
-    particleCanvas.style.left = '0';
-    particleCanvas.style.width = '100%';
-    particleCanvas.style.height = '100%';
-    particleCanvas.style.zIndex = '-1';
-    particleCanvas.style.pointerEvents = 'none';
-    particleCanvas.style.opacity = '0.6';
+    particleCanvas.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        pointer-events: none;
+        opacity: 0.4;
+        will-change: transform;
+    `;
     
     document.body.appendChild(particleCanvas);
     
-    const ctx = particleCanvas.getContext('2d');
+    const ctx = particleCanvas.getContext('2d', { alpha: true });
+    let animationId;
+    let isVisible = true;
     
-    // Resize canvas
+    // Performance optimizations
+    let lastTime = 0;
+    const targetFPS = 30; // Reduced from 60 for better performance
+    const frameDelay = 1000 / targetFPS;
+    
     function resizeCanvas() {
-        particleCanvas.width = window.innerWidth;
-        particleCanvas.height = window.innerHeight;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2); // Cap at 2x
+        particleCanvas.width = window.innerWidth * dpr;
+        particleCanvas.height = window.innerHeight * dpr;
+        particleCanvas.style.width = window.innerWidth + 'px';
+        particleCanvas.style.height = window.innerHeight + 'px';
+        ctx.scale(dpr, dpr);
     }
     
     resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('resize', throttle(resizeCanvas, 250));
     
-    // Particle class
+    // Optimized Particle class
     class Particle {
         constructor() {
-            this.x = Math.random() * particleCanvas.width;
-            this.y = Math.random() * particleCanvas.height;
-            this.vx = (Math.random() - 0.5) * 0.3;
-            this.vy = (Math.random() - 0.5) * 0.3;
-            this.radius = Math.random() * 1.5 + 0.5;
-            this.opacity = Math.random() * 0.3 + 0.1;
-            this.hue = Math.random() * 60 + 220; // Blue to purple range
+            this.reset();
+        }
+        
+        reset() {
+            this.x = Math.random() * window.innerWidth;
+            this.y = Math.random() * window.innerHeight;
+            this.vx = (Math.random() - 0.5) * 0.2; // Reduced speed
+            this.vy = (Math.random() - 0.5) * 0.2;
+            this.radius = Math.random() * 1 + 0.5; // Smaller particles
+            this.opacity = Math.random() * 0.2 + 0.05; // Lower opacity
+            this.life = 1;
         }
         
         update() {
             this.x += this.vx;
             this.y += this.vy;
             
-            if (this.x < 0 || this.x > particleCanvas.width) this.vx *= -1;
-            if (this.y < 0 || this.y > particleCanvas.height) this.vy *= -1;
-            
-            // Fade effect
-            this.opacity += (Math.random() - 0.5) * 0.01;
-            this.opacity = Math.max(0.05, Math.min(0.4, this.opacity));
+            // Simple boundary check
+            if (this.x < 0 || this.x > window.innerWidth || 
+                this.y < 0 || this.y > window.innerHeight) {
+                this.reset();
+            }
         }
         
         draw() {
+            ctx.globalAlpha = this.opacity;
+            ctx.fillStyle = '#2563eb'; // Single color for performance
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-            ctx.fillStyle = `hsla(${this.hue}, 70%, 60%, ${this.opacity})`;
             ctx.fill();
         }
     }
     
-    // Create particles
+    // Fewer particles for better performance
     const particles = [];
-    for (let i = 0; i < 40; i++) {
+    const particleCount = Math.min(15, Math.floor(window.innerWidth / 100));
+    
+    for (let i = 0; i < particleCount; i++) {
         particles.push(new Particle());
     }
     
-    // Animation loop
-    function animate() {
-        ctx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+    // Optimized animation loop
+    function animate(currentTime) {
+        if (!isVisible) return;
         
-        particles.forEach(particle => {
-            particle.update();
-            particle.draw();
-        });
+        if (currentTime - lastTime >= frameDelay) {
+            ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+            
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+            
+            lastTime = currentTime;
+        }
         
-        requestAnimationFrame(animate);
+        animationId = requestAnimationFrame(animate);
     }
     
-    animate();
+    // Visibility API for performance
+    document.addEventListener('visibilitychange', () => {
+        isVisible = !document.hidden;
+        if (isVisible) {
+            animate(performance.now());
+        } else {
+            cancelAnimationFrame(animationId);
+        }
+    });
+    
+    animate(performance.now());
 }
 
 // Expose new functions globally
